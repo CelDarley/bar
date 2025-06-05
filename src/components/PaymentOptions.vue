@@ -72,6 +72,11 @@ const handleCardReaderClose = () => {
 
 const handleCardRead = (cardData) => {
   showCardReader.value = false
+  // Não fecha o modal de pagamento, apenas o leitor de cartão
+  // O usuário ainda precisa escolher a forma de pagamento
+}
+
+const selectPayment = (method) => {
   // Inicia o pedido com status 'preparing'
   const orderNumber = cartStore.checkout()
   if (orderNumber) {
@@ -84,16 +89,11 @@ const handleCardRead = (cardData) => {
       cartStore.updateOrderStatus('delivered')
     }, 10000)
   }
-  close()
-}
-
-const selectPayment = (method) => {
   emit('select', method)
   close()
 }
 
 const handlePixPayment = () => {
-  alert('Conta fechada e paga')
   emit('select', 'pix')
   close()
 }

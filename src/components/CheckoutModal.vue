@@ -84,7 +84,6 @@ const close = () => {
 }
 
 const handlePayment = (method) => {
-  alert(`Pagamento realizado com sucesso via ${method}!`)
   cartStore.clearOrderHistory()
   close()
 }

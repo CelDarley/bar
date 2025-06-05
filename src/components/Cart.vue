@@ -41,7 +41,7 @@
         <div class="cart-total">
           <h2>Total: R$ {{ cartStore.total.toFixed(2) }}</h2>
           <div class="cart-actions">
-            <button class="checkout-btn" @click="showPaymentOptions = true">
+            <button class="checkout-btn" @click="handleCheckout">
               Finalizar Pedido
             </button>
           </div>
@@ -65,19 +65,29 @@
       @close="showPaymentOptions = false"
       @select="handlePayment"
     />
+
+    <CardReader
+      :show="showCardReader"
+      @close="handleCardReaderClose"
+      @card-read="handleCardRead"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useCartStore } from '../stores/cart'
+import { useRouter } from 'vue-router'
 import OrderStatusBar from './OrderStatusBar.vue'
 import CheckoutModal from './CheckoutModal.vue'
 import PaymentOptions from './PaymentOptions.vue'
+import CardReader from './CardReader.vue'
 
+const router = useRouter()
 const cartStore = useCartStore()
 const showCheckoutModal = ref(false)
 const showPaymentOptions = ref(false)
+const showCardReader = ref(false)
 
 const increaseQuantity = (item) => {
   cartStore.addItem({
@@ -94,6 +104,30 @@ const decreaseQuantity = (item) => {
 
 const removeItem = (item) => {
   cartStore.removeItem(item)
+}
+
+const handleCheckout = () => {
+  showCardReader.value = true
+}
+
+const handleCardReaderClose = () => {
+  showCardReader.value = false
+}
+
+const handleCardRead = (cardData) => {
+  showCardReader.value = false
+  const orderNumber = cartStore.checkout()
+  if (orderNumber) {
+    // Simular atualizações de status (em um sistema real, isso viria do backend)
+    setTimeout(() => {
+      cartStore.updateOrderStatus('ready')
+    }, 5000)
+    
+    setTimeout(() => {
+      cartStore.updateOrderStatus('delivered')
+    }, 10000)
+  }
+  router.push('/menu')
 }
 
 const handlePayment = (method) => {
