@@ -2,15 +2,19 @@
   <div class="menu-container">
     <div class="menu">
       <h1>Nosso Cardápio</h1>
-      <div class="dishes-grid">
-        <div v-for="dish in dishes" :key="dish.id" class="dish-card" @click="openModal(dish)">
-          <div class="image-container">
-            <img :src="dish.image" :alt="dish.name">
-          </div>
-          <div class="dish-info">
-            <h2>{{ dish.name }}</h2>
-            <p>{{ dish.description }}</p>
-            <span class="price">R$ {{ dish.price.toFixed(2) }}</span>
+      
+      <div v-for="category in categories" :key="category.id" class="category-section">
+        <h2 class="category-title">{{ category.name }}</h2>
+        <div class="dishes-grid">
+          <div v-for="dish in category.dishes" :key="dish.id" class="dish-card" @click="openModal(dish)">
+            <div class="image-container">
+              <img :src="dish.image" :alt="dish.name">
+            </div>
+            <div class="dish-info">
+              <h2>{{ dish.name }}</h2>
+              <p>{{ dish.description }}</p>
+              <span class="price">R$ {{ dish.price.toFixed(2) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -34,34 +38,100 @@ import AddToCartModal from './AddToCartModal.vue'
 const showModal = ref(false)
 const selectedDish = ref(null)
 
-const dishes = [
+const categories = [
   {
     id: 1,
-    name: 'Filé à Parmegiana',
-    description: 'Filé empanado com molho de tomate e queijo derretido',
-    price: 45.90,
-    image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800&auto=format&fit=crop&q=60'
+    name: 'Entradas',
+    dishes: [
+      {
+        id: 1,
+        name: 'Salada Caesar',
+        description: 'Alface romana, croutons, parmesão e molho caesar',
+        price: 32.90,
+        image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=800&auto=format&fit=crop&q=60'
+      },
+      {
+        id: 2,
+        name: 'Bruschetta',
+        description: 'Pão italiano torrado com tomate, manjericão e azeite',
+        price: 28.50,
+        image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=800&auto=format&fit=crop&q=60'
+      }
+    ]
   },
   {
     id: 2,
-    name: 'Risoto de Cogumelos',
-    description: 'Risoto cremoso com mix de cogumelos frescos',
-    price: 38.50,
-    image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=800&auto=format&fit=crop&q=60'
+    name: 'Pratos Principais',
+    dishes: [
+      {
+        id: 3,
+        name: 'Filé à Parmegiana',
+        description: 'Filé empanado com molho de tomate e queijo derretido',
+        price: 45.90,
+        image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800&auto=format&fit=crop&q=60'
+      },
+      {
+        id: 4,
+        name: 'Risoto de Cogumelos',
+        description: 'Risoto cremoso com mix de cogumelos frescos',
+        price: 38.50,
+        image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=800&auto=format&fit=crop&q=60'
+      },
+      {
+        id: 5,
+        name: 'Pasta Carbonara',
+        description: 'Massa fresca com molho cremoso, bacon e queijo',
+        price: 42.90,
+        image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=60'
+      }
+    ]
   },
   {
     id: 3,
-    name: 'Salada Caesar',
-    description: 'Alface romana, croutons, parmesão e molho caesar',
-    price: 32.90,
-    image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=800&auto=format&fit=crop&q=60'
+    name: 'Sobremesas',
+    dishes: [
+      {
+        id: 6,
+        name: 'Tiramisù',
+        description: 'Sobremesa italiana com café, mascarpone e cacau',
+        price: 24.90,
+        image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800&auto=format&fit=crop&q=60'
+      },
+      {
+        id: 7,
+        name: 'Cheesecake',
+        description: 'Torta de queijo com calda de frutas vermelhas',
+        price: 22.50,
+        image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=800&auto=format&fit=crop&q=60'
+      }
+    ]
   },
   {
     id: 4,
-    name: 'Pasta Carbonara',
-    description: 'Massa fresca com molho cremoso, bacon e queijo',
-    price: 42.90,
-    image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=60'
+    name: 'Bebidas',
+    dishes: [
+      {
+        id: 8,
+        name: 'Caipirinha',
+        description: 'Cachaça, limão, açúcar e gelo',
+        price: 18.90,
+        image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&auto=format&fit=crop&q=60'
+      },
+      {
+        id: 9,
+        name: 'Vinho Tinto',
+        description: 'Taça de vinho tinto seco',
+        price: 16.90,
+        image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&auto=format&fit=crop&q=60'
+      },
+      {
+        id: 10,
+        name: 'Água Mineral',
+        description: 'Garrafa de 500ml',
+        price: 6.90,
+        image: 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=800&auto=format&fit=crop&q=60'
+      }
+    ]
   }
 ]
 
@@ -102,6 +172,18 @@ h1 {
   font-size: 2.5rem;
 }
 
+.category-section {
+  margin-bottom: 3rem;
+}
+
+.category-title {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #eee;
+}
+
 .dishes-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -127,7 +209,7 @@ h1 {
 
 .image-container {
   width: 100%;
-  height: 300px;
+  height: 200px;
   overflow: hidden;
 }
 

@@ -35,14 +35,22 @@
 
       <div class="modal-actions">
         <button class="cancel-btn" @click="close">Fechar</button>
-        <button class="clear-btn" @click="clearHistory">Limpar Histórico</button>
+        <button class="pay-btn" @click="showPaymentOptions = true">Pagar</button>
       </div>
     </div>
   </div>
+
+  <PaymentOptions 
+    :show="showPaymentOptions"
+    @close="showPaymentOptions = false"
+    @select="handlePayment"
+  />
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useCartStore } from '../stores/cart'
+import PaymentOptions from './PaymentOptions.vue'
 
 const props = defineProps({
   show: Boolean
@@ -50,6 +58,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 const cartStore = useCartStore()
+const showPaymentOptions = ref(false)
 
 const formatDate = (date) => {
   return new Date(date).toLocaleString('pt-BR', {
@@ -74,11 +83,10 @@ const close = () => {
   emit('close')
 }
 
-const clearHistory = () => {
-  if (confirm('Tem certeza que deseja limpar o histórico de pedidos?')) {
-    cartStore.clearOrderHistory()
-    close()
-  }
+const handlePayment = (method) => {
+  alert(`Pagamento realizado com sucesso via ${method}!`)
+  cartStore.clearOrderHistory()
+  close()
 }
 </script>
 
@@ -252,5 +260,14 @@ button {
 
 .clear-btn:hover {
   background: #c82333;
+}
+
+.pay-btn {
+  background: #27ae60;
+  color: white;
+}
+
+.pay-btn:hover {
+  background: #219a52;
 }
 </style> 
