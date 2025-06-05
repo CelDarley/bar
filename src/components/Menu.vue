@@ -27,6 +27,11 @@
       :dish="selectedDish"
       @close="closeModal"
     />
+
+    <button class="call-waiter-btn" @click="callWaiter">
+      <span class="waiter-icon">🛎️</span>
+      <span class="waiter-text">Chamar Garçom</span>
+    </button>
   </div>
 </template>
 
@@ -34,7 +39,9 @@
 import { ref } from 'vue'
 import Cart from './Cart.vue'
 import AddToCartModal from './AddToCartModal.vue'
+import { useCartStore } from '../stores/cart'
 
+const cartStore = useCartStore()
 const showModal = ref(false)
 const selectedDish = ref(null)
 
@@ -143,6 +150,19 @@ const openModal = (dish) => {
 const closeModal = () => {
   showModal.value = false
   selectedDish.value = null
+}
+
+const callWaiter = () => {
+  // Adiciona uma chamada ao histórico de chamadas
+  cartStore.addCustomerCall({
+    type: 'waiter',
+    table: 'Mesa 1', // Em um sistema real, isso viria do contexto da mesa
+    status: 'pending',
+    createdAt: new Date()
+  })
+  
+  // Mostra uma mensagem de confirmação
+  alert('Garçom chamado! Ele chegará em breve.')
 }
 </script>
 
@@ -267,6 +287,49 @@ h1 {
   
   h1 {
     font-size: 2rem;
+  }
+}
+
+.call-waiter-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.call-waiter-btn:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.waiter-icon {
+  font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .call-waiter-btn {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .waiter-icon {
+    font-size: 1.2rem;
   }
 }
 </style> 

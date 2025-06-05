@@ -56,6 +56,9 @@
       <div class="items-list">
         <div v-for="item in items" :key="item.id" class="item-card">
           <div class="item-info">
+            <div v-if="item.image" class="item-image">
+              <img :src="item.image" :alt="item.name">
+            </div>
             <h3>{{ item.name }}</h3>
             <p class="item-category">{{ item.category }}</p>
             <p class="item-price">R$ {{ item.price.toFixed(2) }}</p>
@@ -158,6 +161,26 @@
           </div>
 
           <div class="form-group">
+            <label>Foto do Item</label>
+            <div class="image-upload">
+              <div v-if="itemForm.image" class="image-preview">
+                <img :src="itemForm.image" alt="Preview">
+                <button type="button" class="remove-image" @click="removeImage">🗑️</button>
+              </div>
+              <div v-else class="upload-placeholder" @click="triggerFileInput">
+                <span>+ Adicionar Foto</span>
+                <input 
+                  type="file" 
+                  ref="fileInput" 
+                  accept="image/*" 
+                  @change="handleImageUpload" 
+                  style="display: none"
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label>Componentes</label>
             <div class="components-list">
               <div v-for="(component, index) in itemForm.components" :key="index" class="component-item">
@@ -243,8 +266,11 @@ const itemForm = ref({
   category: '',
   price: 0,
   components: [''],
-  optionalItems: ['']
+  optionalItems: [''],
+  image: null
 })
+
+const fileInput = ref(null)
 
 // Dados simulados
 const categories = ref([
@@ -316,7 +342,8 @@ const editItem = (item) => {
     category: item.category,
     price: item.price,
     components: item.components || [''],
-    optionalItems: item.optionalItems || ['']
+    optionalItems: item.optionalItems || [''],
+    image: item.image || null
   }
   showAddItemModal.value = true
 }
@@ -356,13 +383,36 @@ const closeItemModal = () => {
     category: '',
     price: 0,
     components: [''],
-    optionalItems: ['']
+    optionalItems: [''],
+    image: null
   }
 }
 
 const deleteItem = (item) => {
   if (confirm(`Tem certeza que deseja excluir o item "${item.name}"?`)) {
     items.value = items.value.filter(i => i.id !== item.id)
+  }
+}
+
+const triggerFileInput = () => {
+  fileInput.value.click()
+}
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      itemForm.value.image = e.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const removeImage = () => {
+  itemForm.value.image = null
+  if (fileInput.value) {
+    fileInput.value.value = ''
   }
 }
 </script>
@@ -698,5 +748,72 @@ select {
     align-items: flex-start;
     gap: 0.5rem;
   }
+}
+
+.image-upload {
+  margin-top: 0.5rem;
+}
+
+.upload-placeholder {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-placeholder:hover {
+  border-color: #4caf50;
+  background-color: #f5f5f5;
+}
+
+.image-preview {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.remove-image:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.item-image {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style> 

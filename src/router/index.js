@@ -43,6 +43,11 @@ const router = createRouter({
       path: '/settings/menu',
       name: 'MenuSettings',
       component: () => import('../components/settings/MenuSettings.vue')
+    },
+    {
+      path: '/settings/flows',
+      name: 'FlowSettings',
+      component: () => import('../components/settings/FlowSettings.vue')
     }
   ]
 })
