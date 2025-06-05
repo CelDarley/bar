@@ -20,29 +20,45 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 const props = defineProps({
   show: Boolean
 })
 
-const emit = defineEmits(['close', 'card-read'])
+const emit = defineEmits(['close', 'read'])
 
-const close = () => {
-  emit('close')
+let timer = null
+
+const startTimer = () => {
+  if (timer) {
+    clearTimeout(timer)
+  }
+  
+  timer = setTimeout(() => {
+    emit('read')
+    emit('close')
+  }, 3000)
 }
 
-// Simula a leitura do cartão após 3 segundos
 watch(() => props.show, (newValue) => {
   if (newValue) {
-    setTimeout(() => {
-      emit('card-read', {
-        id: 'CARD_' + Math.random().toString(36).substr(2, 9),
-        timestamp: new Date().toISOString()
-      })
-    }, 3000)
+    startTimer()
+  }
+}, { immediate: true })
+
+onUnmounted(() => {
+  if (timer) {
+    clearTimeout(timer)
   }
 })
+
+const close = () => {
+  if (timer) {
+    clearTimeout(timer)
+  }
+  emit('close')
+}
 </script>
 
 <style scoped>

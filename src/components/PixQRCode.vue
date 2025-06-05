@@ -3,16 +3,26 @@
     <div class="modal-content" @click.stop>
       <h2>Pagamento via PIX</h2>
       
-      <div class="qrcode-container">
-        <div class="qrcode">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PIX123456789" alt="QR Code PIX" />
+      <div class="qr-code-container">
+        <div class="qr-code">
+          <!-- Aqui você pode adicionar a imagem do QR code gerado -->
+          <div class="placeholder-qr">
+            <i class="fas fa-qrcode"></i>
+            <span>QR Code do PIX</span>
+          </div>
         </div>
-        <p class="instructions">Escaneie o QR Code com seu aplicativo de pagamento</p>
+        
+        <div class="pix-info">
+          <p>Escaneie o QR code acima com seu aplicativo de pagamento</p>
+          <p class="amount">Valor: R$ {{ amount.toFixed(2) }}</p>
+        </div>
       </div>
 
       <div class="modal-actions">
         <button class="cancel-btn" @click="close">Cancelar</button>
-        <button class="confirm-btn" @click="confirmPayment">Confirmar Pagamento</button>
+        <button class="confirm-btn" @click="confirmPayment">
+          Confirmar Pagamento
+        </button>
       </div>
     </div>
   </div>
@@ -20,7 +30,11 @@
 
 <script setup>
 const props = defineProps({
-  show: Boolean
+  show: Boolean,
+  amount: {
+    type: Number,
+    required: true
+  }
 })
 
 const emit = defineEmits(['close', 'confirm'])
@@ -54,39 +68,59 @@ const confirmPayment = () => {
   padding: 2rem;
   border-radius: 12px;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
 }
 
 h2 {
   color: #333;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
-.qrcode-container {
+.qr-code-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.qrcode {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.qrcode img {
+.qr-code {
   width: 200px;
   height: 200px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #dee2e6;
 }
 
-.instructions {
+.placeholder-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
   color: #666;
+}
+
+.placeholder-qr i {
+  font-size: 3rem;
+}
+
+.pix-info {
   text-align: center;
-  font-size: 0.9rem;
+}
+
+.pix-info p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.amount {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
 }
 
 .modal-actions {
@@ -95,30 +129,46 @@ h2 {
   gap: 1rem;
 }
 
-button {
+.cancel-btn,
+.confirm-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .cancel-btn {
-  background: #f0f0f0;
-  color: #666;
-}
-
-.cancel-btn:hover {
-  background: #e0e0e0;
-}
-
-.confirm-btn {
-  background: #27ae60;
+  background-color: #e74c3c;
   color: white;
 }
 
+.confirm-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #c0392b;
+}
+
 .confirm-btn:hover {
-  background: #219a52;
+  background-color: #2980b9;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 1rem;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-btn,
+  .confirm-btn {
+    width: 100%;
+  }
 }
 </style> 
