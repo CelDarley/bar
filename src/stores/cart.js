@@ -2,13 +2,21 @@ import { defineStore } from 'pinia'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: []
+    items: [],
+    currentOrder: null,
+    orderHistory: []
   }),
 
   getters: {
     total: (state) => {
       return state.items.reduce((total, item) => {
         return total + (item.price * item.quantity)
+      }, 0)
+    },
+    
+    totalSpent: (state) => {
+      return state.orderHistory.reduce((total, order) => {
+        return total + order.total
       }, 0)
     }
   },
@@ -33,6 +41,40 @@ export const useCartStore = defineStore('cart', {
 
     clearCart() {
       this.items = []
+    },
+
+    checkout() {
+      if (this.items.length === 0) return
+
+      const orderNumber = Math.floor(Math.random() * 1000) + 1
+      const order = {
+        number: orderNumber,
+        items: [...this.items],
+        total: this.total,
+        status: 'preparing',
+        createdAt: new Date()
+      }
+      
+      this.currentOrder = order
+      this.orderHistory.push(order)
+      this.clearCart()
+      return orderNumber
+    },
+
+    updateOrderStatus(status) {
+      if (this.currentOrder) {
+        this.currentOrder.status = status
+        // Atualiza também no histórico
+        const orderInHistory = this.orderHistory.find(o => o.number === this.currentOrder.number)
+        if (orderInHistory) {
+          orderInHistory.status = status
+        }
+      }
+    },
+
+    clearOrderHistory() {
+      this.orderHistory = []
+      this.currentOrder = null
     }
   }
 }) 

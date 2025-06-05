@@ -1,5 +1,12 @@
 <template>
   <div class="cart-container">
+    <OrderStatusBar
+      v-if="cartStore.currentOrder"
+      :show="true"
+      :order-number="cartStore.currentOrder.number"
+      :status="cartStore.currentOrder.status"
+    />
+    
     <h2>Seu Pedido</h2>
     <div class="cart">
       <h1>Seu Pedido</h1>
@@ -33,19 +40,36 @@
 
         <div class="cart-total">
           <h2>Total: R$ {{ cartStore.total.toFixed(2) }}</h2>
-          <button class="checkout-btn" @click="checkout">
-            Finalizar Pedido
-          </button>
+          <div class="cart-actions">
+            <button class="checkout-btn" @click="checkout">
+              Finalizar Pedido
+            </button>
+          </div>
         </div>
       </div>
+
+      <div class="cart-actions-container">
+        <button class="close-account-btn" @click="showCheckoutModal = true">
+          Fechar Conta
+        </button>
+      </div>
     </div>
+
+    <CheckoutModal
+      :show="showCheckoutModal"
+      @close="showCheckoutModal = false"
+    />
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useCartStore } from '../stores/cart'
+import OrderStatusBar from './OrderStatusBar.vue'
+import CheckoutModal from './CheckoutModal.vue'
 
 const cartStore = useCartStore()
+const showCheckoutModal = ref(false)
 
 const increaseQuantity = (item) => {
   cartStore.addItem({
@@ -65,9 +89,17 @@ const removeItem = (item) => {
 }
 
 const checkout = () => {
-  // Aqui você pode implementar a lógica de finalização do pedido
-  alert('Pedido finalizado com sucesso!')
-  cartStore.clearCart()
+  const orderNumber = cartStore.checkout()
+  if (orderNumber) {
+    // Simular atualizações de status (em um sistema real, isso viria do backend)
+    setTimeout(() => {
+      cartStore.updateOrderStatus('ready')
+    }, 5000)
+    
+    setTimeout(() => {
+      cartStore.updateOrderStatus('delivered')
+    }, 10000)
+  }
 }
 </script>
 
@@ -196,6 +228,12 @@ h1 {
   color: #333;
 }
 
+.cart-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 .checkout-btn {
   padding: 1rem 2rem;
   background-color: #28a745;
@@ -209,6 +247,30 @@ h1 {
 
 .checkout-btn:hover {
   background-color: #218838;
+}
+
+.cart-actions-container {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #dee2e6;
+  text-align: center;
+}
+
+.close-account-btn {
+  padding: 1rem 2rem;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 300px;
+}
+
+.close-account-btn:hover {
+  background-color: #34495e;
 }
 
 @media (max-width: 768px) {
