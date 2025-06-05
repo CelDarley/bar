@@ -3,12 +3,9 @@
     <nav class="navbar">
       <router-link to="/" class="nav-link">Home</router-link>
       <router-link to="/menu" class="nav-link">Cardápio</router-link>
-      <router-link to="/pedido" class="nav-link">
-        Pedido
-        <span v-if="cartStore.items.length" class="cart-count">
-          {{ cartStore.items.length }}
-        </span>
-      </router-link>
+      <router-link to="/calls" class="nav-link">Chamadas Clientes</router-link>
+      <router-link to="/kitchen" class="nav-link">Cozinha</router-link>
+      <router-link to="/settings" class="nav-link">Configurações</router-link>
     </nav>
 
     <router-view></router-view>
@@ -59,23 +56,6 @@ body {
 
 .nav-link:hover {
   background-color: #34495e;
-}
-
-.cart-link {
-  position: relative;
-}
-
-.cart-count {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: #e74c3c;
-  color: white;
-  font-size: 0.8rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 50%;
-  min-width: 20px;
-  text-align: center;
 }
 
 .router-link-active {

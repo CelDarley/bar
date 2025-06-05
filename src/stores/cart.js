@@ -61,14 +61,16 @@ export const useCartStore = defineStore('cart', {
       return orderNumber
     },
 
-    updateOrderStatus(status) {
-      if (this.currentOrder) {
+    updateOrderStatus(status, orderNumber) {
+      // Atualiza o pedido atual se o número corresponder
+      if (this.currentOrder && this.currentOrder.number === orderNumber) {
         this.currentOrder.status = status
-        // Atualiza também no histórico
-        const orderInHistory = this.orderHistory.find(o => o.number === this.currentOrder.number)
-        if (orderInHistory) {
-          orderInHistory.status = status
-        }
+      }
+      
+      // Atualiza o pedido no histórico
+      const orderInHistory = this.orderHistory.find(o => o.number === orderNumber)
+      if (orderInHistory) {
+        orderInHistory.status = status
       }
     },
 
