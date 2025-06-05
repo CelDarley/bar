@@ -41,7 +41,7 @@
         <div class="cart-total">
           <h2>Total: R$ {{ cartStore.total.toFixed(2) }}</h2>
           <div class="cart-actions">
-            <button class="checkout-btn" @click="checkout">
+            <button class="checkout-btn" @click="showPaymentOptions = true">
               Finalizar Pedido
             </button>
           </div>
@@ -59,6 +59,12 @@
       :show="showCheckoutModal"
       @close="showCheckoutModal = false"
     />
+
+    <PaymentOptions
+      :show="showPaymentOptions"
+      @close="showPaymentOptions = false"
+      @select="handlePayment"
+    />
   </div>
 </template>
 
@@ -67,9 +73,11 @@ import { ref } from 'vue'
 import { useCartStore } from '../stores/cart'
 import OrderStatusBar from './OrderStatusBar.vue'
 import CheckoutModal from './CheckoutModal.vue'
+import PaymentOptions from './PaymentOptions.vue'
 
 const cartStore = useCartStore()
 const showCheckoutModal = ref(false)
+const showPaymentOptions = ref(false)
 
 const increaseQuantity = (item) => {
   cartStore.addItem({
@@ -88,7 +96,12 @@ const removeItem = (item) => {
   cartStore.removeItem(item)
 }
 
-const checkout = () => {
+const handlePayment = (method) => {
+  if (method === 'card') {
+    // Se for cartão, apenas fecha o modal
+    return
+  }
+  
   const orderNumber = cartStore.checkout()
   if (orderNumber) {
     // Simular atualizações de status (em um sistema real, isso viria do backend)

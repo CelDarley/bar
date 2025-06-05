@@ -26,6 +26,12 @@
     </div>
   </div>
 
+  <CardReader 
+    :show="showCardReader"
+    @close="handleCardReaderClose"
+    @card-read="handleCardRead"
+  />
+
   <PixQRCode 
     :show="showPixQRCode"
     @close="showPixQRCode = false"
@@ -34,18 +40,51 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import PixQRCode from './PixQRCode.vue'
+import CardReader from './CardReader.vue'
+import { useCartStore } from '../stores/cart'
 
 const props = defineProps({
   show: Boolean
 })
 
 const emit = defineEmits(['close', 'select'])
+const cartStore = useCartStore()
 const showPixQRCode = ref(false)
+const showCardReader = ref(false)
+
+// Mostra o leitor de cartão quando o modal de pagamento é aberto
+watch(() => props.show, (newValue) => {
+  if (newValue) {
+    showCardReader.value = true
+  }
+})
 
 const close = () => {
   emit('close')
+}
+
+const handleCardReaderClose = () => {
+  showCardReader.value = false
+  close()
+}
+
+const handleCardRead = (cardData) => {
+  showCardReader.value = false
+  // Inicia o pedido com status 'preparing'
+  const orderNumber = cartStore.checkout()
+  if (orderNumber) {
+    // Simular atualizações de status
+    setTimeout(() => {
+      cartStore.updateOrderStatus('ready')
+    }, 5000)
+    
+    setTimeout(() => {
+      cartStore.updateOrderStatus('delivered')
+    }, 10000)
+  }
+  close()
 }
 
 const selectPayment = (method) => {
