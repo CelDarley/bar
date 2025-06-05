@@ -3,8 +3,8 @@
     <nav class="navbar">
       <router-link to="/" class="nav-link">Home</router-link>
       <router-link to="/menu" class="nav-link">Cardápio</router-link>
-      <router-link to="/cart" class="nav-link cart-link">
-        Carrinho
+      <router-link to="/pedido" class="nav-link">
+        Pedido
         <span v-if="cartStore.items.length" class="cart-count">
           {{ cartStore.items.length }}
         </span>

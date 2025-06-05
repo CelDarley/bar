@@ -1,7 +1,7 @@
 <template>
   <div v-if="show" class="modal-overlay" @click="close">
     <div class="modal-content" @click.stop>
-      <h2>Adicionar ao Carrinho</h2>
+      <h2>Adicionar ao Pedido</h2>
       <div class="dish-info">
         <img :src="dish.image" :alt="dish.name">
         <h3>{{ dish.name }}</h3>
@@ -24,7 +24,7 @@
 
       <div class="modal-actions">
         <button class="cancel-btn" @click="close">Cancelar</button>
-        <button class="add-btn" @click="addToCart">Adicionar</button>
+        <button class="add-btn" @click="addToCart">Adicionar ao Pedido</button>
       </div>
     </div>
   </div>

@@ -1,13 +1,12 @@
 <template>
   <div class="cart-container">
+    <h2>Seu Pedido</h2>
     <div class="cart">
-      <h1>Seu Carrinho</h1>
+      <h1>Seu Pedido</h1>
       
       <div v-if="cartStore.items.length === 0" class="empty-cart">
-        <p>Seu carrinho está vazio</p>
-        <router-link to="/menu" class="continue-shopping">
-          Continuar Comprando
-        </router-link>
+        <p>Seu pedido está vazio</p>
+        <router-link to="/menu" class="menu-link">Ver Menu</router-link>
       </div>
 
       <div v-else class="cart-items">
@@ -104,7 +103,7 @@ h1 {
   margin-bottom: 1rem;
 }
 
-.continue-shopping {
+.menu-link {
   display: inline-block;
   padding: 0.75rem 1.5rem;
   background-color: #2c3e50;
@@ -114,7 +113,7 @@ h1 {
   transition: background-color 0.3s ease;
 }
 
-.continue-shopping:hover {
+.menu-link:hover {
   background-color: #34495e;
 }
 
