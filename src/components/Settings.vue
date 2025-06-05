@@ -26,6 +26,12 @@
         <h2>Configuração de Pagamentos</h2>
         <p>Gerencie métodos de pagamento e taxas</p>
       </router-link>
+
+      <router-link to="/settings/menu" class="settings-card">
+        <div class="card-icon">📋</div>
+        <h2>Gestão de Cardápios</h2>
+        <p>Gerencie categorias, produtos e preços</p>
+      </router-link>
     </div>
   </div>
 </template>
