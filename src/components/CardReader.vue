@@ -111,8 +111,8 @@ h2 {
 }
 
 .card-icon {
-  font-size: 4rem;
-  z-index: 2;
+  font-size: 3rem;
+  animation: pulse 2s infinite;
 }
 
 .scan-animation {
@@ -122,7 +122,7 @@ h2 {
   right: 0;
   height: 2px;
   background: #27ae60;
-  animation: scan 2s linear infinite;
+  animation: scan 3s linear;
   z-index: 1;
 }
 
@@ -131,46 +131,42 @@ h2 {
   top: 0;
   left: 0;
   right: 0;
-  height: 100%;
-  background: linear-gradient(to bottom, 
-    rgba(39, 174, 96, 0) 0%,
-    rgba(39, 174, 96, 0.2) 50%,
-    rgba(39, 174, 96, 0) 100%
-  );
-  animation: scanLine 2s linear infinite;
-  z-index: 1;
+  height: 2px;
+  background: #27ae60;
+  animation: scan 3s linear;
 }
 
 @keyframes scan {
   0% {
     top: 0;
   }
-  50% {
-    top: 100%;
-  }
   100% {
-    top: 0;
+    top: 100%;
   }
 }
 
-@keyframes scanLine {
+@keyframes pulse {
   0% {
-    transform: translateY(-100%);
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
   }
   100% {
-    transform: translateY(100%);
+    transform: scale(1);
   }
 }
 
 .instructions {
   color: #666;
   text-align: center;
-  font-size: 0.9rem;
+  margin-top: 1rem;
 }
 
 .modal-actions {
   display: flex;
   justify-content: center;
+  margin-top: 2rem;
 }
 
 .cancel-btn {
@@ -180,8 +176,7 @@ h2 {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 .cancel-btn:hover {

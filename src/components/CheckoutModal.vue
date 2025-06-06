@@ -1,71 +1,71 @@
 <template>
   <div v-if="show" class="modal-overlay" @click="close">
     <div class="modal-content" @click.stop>
-      <h2>Fechar Conta</h2>
-      
-      <div class="order-status-bar" v-if="cartStore.orderHistory.length > 0">
-        <div class="status-steps">
-          <div class="step" :class="{ active: currentOrder?.status === 'preparando' }">
-            <div class="step-icon">👨‍🍳</div>
-            <span>Em preparação</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step" :class="{ active: currentOrder?.status === 'pronto' }">
-            <div class="step-icon">✅</div>
-            <span>Pronto</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step" :class="{ active: currentOrder?.status === 'entregue' }">
-            <div class="step-icon">🎉</div>
-            <span>Entregue</span>
-          </div>
-        </div>
+      <div class="modal-header">
+        <h2>Fechar Conta</h2>
+        <button class="close-btn" @click="close">×</button>
       </div>
 
-      <div class="order-history">
-        <div v-for="order in cartStore.orderHistory" :key="order.number" class="order-item">
-          <div class="order-header">
-            <span class="order-number">Pedido #{{ order.number }}</span>
-            <span class="order-date">{{ formatDate(order.createdAt) }}</span>
-            <span class="order-status" :class="'status-' + order.status">
-              {{ getStatusText(order.status) }}
-            </span>
-          </div>
-          
-          <div class="order-items">
-            <div v-for="item in order.items" :key="item.id" class="order-item-detail">
-              <span class="item-quantity">{{ item.quantity }}x</span>
-              <span class="item-name">{{ item.name }}</span>
-              <span class="item-price">R$ {{ (item.price * item.quantity).toFixed(2) }}</span>
+      <div class="modal-body">
+        <div v-if="cartStore.orderHistory.length === 0" class="no-consumption">
+          <p>Nada foi consumido</p>
+        </div>
+        <div v-else>
+          <div class="order-history">
+            <h3>Histórico de Pedidos</h3>
+            <div v-for="order in cartStore.orderHistory" :key="order.number" class="order-item">
+              <div class="order-header">
+                <span class="order-number">Pedido #{{ order.number }}</span>
+                <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+                <span class="order-status" :class="'status-' + order.status">
+                  {{ getStatusText(order.status) }}
+                </span>
+              </div>
+              <div class="order-items">
+                <div v-for="item in order.items" :key="item.id" class="order-item-detail">
+                  <span class="item-quantity">{{ item.quantity }}x</span>
+                  <span class="item-name">{{ item.name }}</span>
+                  <span class="item-price">R$ {{ (item.price * item.quantity).toFixed(2) }}</span>
+                </div>
+              </div>
+              <div class="order-total">
+                Total: R$ {{ order.total.toFixed(2) }}
+              </div>
             </div>
           </div>
-          
-          <div class="order-total">
-            <span>Subtotal:</span>
-            <span>R$ {{ order.total.toFixed(2) }}</span>
+
+          <div class="total-section">
+            <div class="total-row">
+              <span>Total Consumido:</span>
+              <span>R$ {{ cartStore.totalSpent.toFixed(2) }}</span>
+            </div>
+            <div class="total-row">
+              <span>Taxa de Serviço (10%):</span>
+              <span>R$ {{ serviceFee.toFixed(2) }}</span>
+            </div>
+            <div class="total-row final">
+              <span>Total a Pagar:</span>
+              <span>R$ {{ totalWithFee.toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="payment-options">
+            <button class="pay-all-btn" @click="handlePayAll">
+              Pagar Tudo
+            </button>
+            <button class="split-pay-btn" @click="handleSplitPayment">
+              Dividir Conta
+            </button>
+            <button class="pay-individual-btn" @click="handleIndividualPayment">
+              Pagar Individualmente
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="total-amount">
-        <h3>Total Gasto</h3>
-        <span class="amount">R$ {{ totalAmount.toFixed(2) }}</span>
-      </div>
-
-      <div class="payment-options">
-        <button class="pay-all-btn" @click="handlePayAll">
-          Pagar Tudo
-        </button>
-        <button class="split-pay-btn" @click="handleSplitPayment">
-          Dividir Conta
-        </button>
-        <button class="pay-individual-btn" @click="handleIndividualPayment">
-          Pagar Individualmente
-        </button>
-      </div>
-
-      <div class="modal-actions">
-        <button class="cancel-btn" @click="close">Fechar</button>
+      <div class="modal-footer">
+        <button class="cancel-btn" @click="close">Cancelar</button>
+        <button v-if="cartStore.orderHistory.length > 0" class="confirm-btn" @click="handleConfirm">Confirmar</button>
       </div>
     </div>
   </div>
@@ -244,15 +244,19 @@ const handlePixPayment = () => {
       remainingAmount.value -= lastSplitPaid.value
       
       if (remainingAmount.value <= 0) {
-        // Fecha o modal
+        // Fecha todos os modais e redireciona para o cardápio
         showPaymentOptions.value = false
+        close()
+        window.location.href = '/menu'
       } else {
         // Reabre o modal de divisão
         showSplitPayment.value = true
       }
     } else {
-      // Fecha o modal
+      // Fecha todos os modais e redireciona para o cardápio
       showPaymentOptions.value = false
+      close()
+      window.location.href = '/menu'
     }
   }, 1000)
 }
@@ -261,6 +265,19 @@ const handleSplitPaymentConfirm = (data) => {
   lastSplitPaid.value = data.amount
   showPaymentOptions.value = true
   isSplitPayment.value = true
+}
+
+const serviceFee = computed(() => {
+  return totalAmount.value * 0.1
+})
+
+const totalWithFee = computed(() => {
+  return totalAmount.value + serviceFee.value
+})
+
+const handleConfirm = () => {
+  // Implemente a lógica para confirmar o fechamento da conta
+  console.log('Fechamento confirmado')
 }
 </script>
 
@@ -288,85 +305,28 @@ const handleSplitPaymentConfirm = (data) => {
   overflow-y: auto;
 }
 
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
 h2 {
   color: #333;
   margin-bottom: 1.5rem;
   text-align: center;
 }
 
-.order-status-bar {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 8px;
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-body {
   margin-bottom: 2rem;
-}
-
-.status-steps {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-}
-
-.step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  z-index: 1;
-}
-
-.step-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #e9ecef;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
-}
-
-.step.active .step-icon {
-  background: #27ae60;
-  color: white;
-  transform: scale(1.1);
-}
-
-.step span {
-  font-size: 0.9rem;
-  color: #666;
-  transition: all 0.3s ease;
-}
-
-.step.active span {
-  color: #27ae60;
-  font-weight: bold;
-}
-
-.step-line {
-  flex: 1;
-  height: 2px;
-  background: #e9ecef;
-  margin: 0 1rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.step-line::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 0;
-  background: #27ae60;
-  transition: width 0.5s ease;
-}
-
-.step.active ~ .step-line::after {
-  width: 100%;
 }
 
 .order-history {
@@ -460,30 +420,84 @@ h2 {
   color: #2c3e50;
 }
 
-.total-amount {
-  text-align: center;
-  margin: 2rem 0;
+.total-section {
+  margin-top: 2rem;
   padding: 1rem;
   background: #f8f9fa;
   border-radius: 8px;
 }
 
-.total-amount h3 {
-  color: #2c3e50;
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.5rem;
 }
 
-.amount {
-  font-size: 1.5rem;
+.total-row span {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.total-row final {
   font-weight: bold;
   color: #2c3e50;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.cancel-btn,
+.confirm-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.cancel-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.confirm-btn {
+  background-color: #27ae60;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #c0392b;
+}
+
+.confirm-btn:hover {
+  background-color: #219a52;
+}
+
+.no-consumption {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1.2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.no-consumption p {
+  margin: 0;
+  line-height: 1.5;
 }
 
 .payment-options {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  margin: 2rem 0;
 }
 
 .pay-all-btn,
@@ -522,27 +536,6 @@ h2 {
 
 .pay-individual-btn:hover {
   background-color: #8e44ad;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.cancel-btn {
-  padding: 0.75rem 1.5rem;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.cancel-btn:hover {
-  background-color: #c0392b;
 }
 
 @media (max-width: 768px) {

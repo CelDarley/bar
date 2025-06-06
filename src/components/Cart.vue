@@ -1,59 +1,60 @@
 <template>
-  <div class="cart-container">
+  <div class="page-container">
     <OrderStatusBar
       v-if="cartStore.currentOrder"
       :show="true"
       :order-number="cartStore.currentOrder.number"
       :status="cartStore.currentOrder.status"
+      @update:order-number="handleOrderChange"
     />
     
-    <h2>Seu Pedido</h2>
-    <div class="cart">
-      <h1>Seu Pedido</h1>
+    <main class="main-content">
+      <h1 class="page-title">Seu Pedido</h1>
       
-      <div v-if="cartStore.items.length === 0" class="empty-cart">
-        <p>Seu pedido está vazio</p>
-        <router-link to="/menu" class="menu-link">Ver Menu</router-link>
-      </div>
-
-      <div v-else class="cart-items">
-        <div v-for="item in cartStore.items" :key="item.id" class="cart-item">
-          <div class="item-info">
-            <h3>{{ item.name }}</h3>
-            <p v-if="item.notes" class="notes">{{ item.notes }}</p>
-          </div>
-          
-          <div class="item-quantity">
-            <button @click="decreaseQuantity(item)" class="quantity-btn">-</button>
-            <span>{{ item.quantity }}</span>
-            <button @click="increaseQuantity(item)" class="quantity-btn">+</button>
-          </div>
-          
-          <div class="item-price">
-            R$ {{ (item.price * item.quantity).toFixed(2) }}
-          </div>
-          
-          <button @click="removeItem(item)" class="remove-btn">
-            Remover
-          </button>
+      <div class="cart">
+        <div v-if="cartStore.items.length === 0" class="empty-cart">
+          <p>Seu pedido está vazio</p>
         </div>
 
-        <div class="cart-total">
-          <h2>Total: R$ {{ cartStore.total.toFixed(2) }}</h2>
-          <div class="cart-actions">
-            <button class="checkout-btn" @click="handleCheckout">
-              Finalizar Pedido
+        <div v-else class="cart-items">
+          <div v-for="item in cartStore.items" :key="item.id" class="cart-item">
+            <div class="item-info">
+              <h3>{{ item.name }}</h3>
+              <p v-if="item.notes" class="notes">{{ item.notes }}</p>
+            </div>
+            
+            <div class="item-quantity">
+              <button @click="decreaseQuantity(item)" class="quantity-btn">-</button>
+              <span>{{ item.quantity }}</span>
+              <button @click="increaseQuantity(item)" class="quantity-btn">+</button>
+            </div>
+            
+            <div class="item-price">
+              R$ {{ (item.price * item.quantity).toFixed(2) }}
+            </div>
+            
+            <button @click="removeItem(item)" class="remove-btn">
+              Remover
             </button>
           </div>
+
+          <div class="cart-total">
+            <h2>Total: R$ {{ cartStore.total.toFixed(2) }}</h2>
+            <div class="cart-actions">
+              <button class="checkout-btn" @click="handleCheckout">
+                Finalizar Pedido
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-actions-container">
+          <button class="close-account-btn" @click="showCheckoutModal = true">
+            Fechar Conta
+          </button>
         </div>
       </div>
-
-      <div class="cart-actions-container">
-        <button class="close-account-btn" @click="showCheckoutModal = true">
-          Fechar Conta
-        </button>
-      </div>
-    </div>
+    </main>
 
     <CheckoutModal
       :show="showCheckoutModal"
@@ -107,7 +108,17 @@ const removeItem = (item) => {
 }
 
 const handleCheckout = () => {
-  showCardReader.value = true
+  const orderNumber = cartStore.checkout()
+  if (orderNumber) {
+    // Simular atualizações de status (em um sistema real, isso viria do backend)
+    setTimeout(() => {
+      cartStore.updateOrderStatus('ready', orderNumber)
+    }, 5000)
+    
+    setTimeout(() => {
+      cartStore.updateOrderStatus('delivered', orderNumber)
+    }, 10000)
+  }
 }
 
 const handleCardReaderClose = () => {
@@ -120,19 +131,18 @@ const handleCardRead = (cardData) => {
   if (orderNumber) {
     // Simular atualizações de status (em um sistema real, isso viria do backend)
     setTimeout(() => {
-      cartStore.updateOrderStatus('ready')
+      cartStore.updateOrderStatus('ready', orderNumber)
     }, 5000)
     
     setTimeout(() => {
-      cartStore.updateOrderStatus('delivered')
+      cartStore.updateOrderStatus('delivered', orderNumber)
     }, 10000)
   }
-  router.push('/menu')
 }
 
 const handlePayment = (method) => {
-  if (method === 'card') {
-    // Se for cartão, apenas fecha o modal
+  if (method.option === 'card') {
+    showCardReader.value = true
     return
   }
   
@@ -140,21 +150,52 @@ const handlePayment = (method) => {
   if (orderNumber) {
     // Simular atualizações de status (em um sistema real, isso viria do backend)
     setTimeout(() => {
-      cartStore.updateOrderStatus('ready')
+      cartStore.updateOrderStatus('ready', orderNumber)
     }, 5000)
     
     setTimeout(() => {
-      cartStore.updateOrderStatus('delivered')
+      cartStore.updateOrderStatus('delivered', orderNumber)
     }, 10000)
+  }
+  showPaymentOptions.value = false
+}
+
+const handleOrderChange = (newOrderNumber) => {
+  if (newOrderNumber === null) {
+    cartStore.currentOrder = null
+    return
+  }
+  
+  const order = cartStore.orderHistory.find(o => o.number === newOrderNumber)
+  if (order) {
+    cartStore.currentOrder = { ...order }
   }
 }
 </script>
 
 <style scoped>
-.cart-container {
-  padding: 2rem;
+.page-container {
   min-height: 100vh;
   background-color: #f5f5f5;
+  position: relative;
+}
+
+.main-content {
+  padding: 2rem;
+  padding-top: v-bind('cartStore.currentOrder ? "8rem" : "2rem"');
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 2rem;
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .cart {
@@ -166,12 +207,6 @@ const handlePayment = (method) => {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #333;
-}
-
 .empty-cart {
   text-align: center;
   padding: 2rem;
@@ -180,20 +215,6 @@ h1 {
 .empty-cart p {
   color: #666;
   margin-bottom: 1rem;
-}
-
-.menu-link {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #2c3e50;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: background-color 0.3s ease;
-}
-
-.menu-link:hover {
-  background-color: #34495e;
 }
 
 .cart-items {

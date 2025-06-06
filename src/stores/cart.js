@@ -35,7 +35,11 @@ export const useCartStore = defineStore('cart', {
     removeItem(item) {
       const index = this.items.findIndex(i => i.id === item.id && i.notes === item.notes)
       if (index > -1) {
-        this.items.splice(index, 1)
+        if (this.items[index].quantity > 1) {
+          this.items[index].quantity--
+        } else {
+          this.items.splice(index, 1)
+        }
       }
     },
 
@@ -44,7 +48,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     checkout() {
-      if (this.items.length === 0) return
+      if (this.items.length === 0) return null
 
       const orderNumber = Math.floor(Math.random() * 1000) + 1
       const order = {
@@ -55,22 +59,27 @@ export const useCartStore = defineStore('cart', {
         createdAt: new Date()
       }
       
-      this.currentOrder = order
-      this.orderHistory.push(order)
+      // Primeiro limpa o carrinho
       this.clearCart()
+      
+      // Depois atualiza o pedido atual e o histórico
+      this.currentOrder = { ...order }
+      this.orderHistory.push({ ...order })
+      
       return orderNumber
     },
 
     updateOrderStatus(status, orderNumber) {
       // Atualiza o pedido atual se o número corresponder
       if (this.currentOrder && this.currentOrder.number === orderNumber) {
-        this.currentOrder.status = status
+        this.currentOrder = { ...this.currentOrder, status }
       }
       
       // Atualiza o pedido no histórico
       const orderInHistory = this.orderHistory.find(o => o.number === orderNumber)
       if (orderInHistory) {
-        orderInHistory.status = status
+        const index = this.orderHistory.indexOf(orderInHistory)
+        this.orderHistory[index] = { ...orderInHistory, status }
       }
     },
 
